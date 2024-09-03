@@ -1,20 +1,43 @@
 import React, { useState } from "react";
 import GoogleButton from "react-google-button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useUserAuth } from "../context/UserAuthContext";
+import Alert from "./Alert";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {logIn,googleSignIn}= useUserAuth();
+  const navigate=useNavigate();
+  const [error,setError]=useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    setEmail("");
+    setPassword("")
+    try {
+      await logIn(email,password)
+      navigate("/home")
+    } catch (error) {
+      console.log(error)
+      setError("Email or Password Incorrect")
+    }
   };
+
+  const handleGoogleSignIn= async (e)=>{
+    e.preventDefault();
+    try {
+      await googleSignIn();
+      navigate("/home")
+    } catch (error) {
+      console.log(error)
+      setError("Unable to signin using google")
+    }
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-200">
+      {error && <Alert error={error} setError={setError}/>}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-80"
@@ -58,9 +81,12 @@ const Login = () => {
         >
           Login
         </button>
+        <div className="text-xs mt-2 font-semibold">
+          <Link to={'/reset'}>Forgot Password?</Link>
+        </div>
         <hr className="mt-5 border-[1px]"/>
         <div className="w-full mt-5 flex justify-center">
-          <GoogleButton className="g-btn" type="dark" />
+          <GoogleButton className="g-btn" type="dark" onClick={handleGoogleSignIn}/>
         </div>
         <div className="mt-5">
           <p>Don't have an account? <Link to={'/register'} className="text-blue-600 font-semibold">Register</Link></p>
