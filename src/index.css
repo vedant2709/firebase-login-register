@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.PhoneInputInput:focus-visible {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+}
